@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package controlador;
-import modelo.*;
-
+package principal;
+import presentador.vista.VistaPersona;
 /**
  *
  * @author Chelo
@@ -16,9 +15,9 @@ public class Principal {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here    
+        // TODO code application logic here   
+        VistaPersona vista = new VistaPersona();
         
-        ControladorPersona.iniciar();
     }
     
 }

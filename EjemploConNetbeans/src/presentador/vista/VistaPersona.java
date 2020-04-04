@@ -3,19 +3,30 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package vista;
+package presentador.vista;
+import dominio.Persona;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import presentador.interfaces.IGestionarPersonas;
+import presentador.presentador.PresentadorPersona;
 
 /**
  *
  * @author Chelo
  */
-public class VistaPersona extends javax.swing.JFrame {
+public class VistaPersona extends javax.swing.JFrame implements IGestionarPersonas  {
 
     /**
      * Creates new form VistaPersona
      */
+    private PresentadorPersona presentador;
     public VistaPersona() {
         initComponents();
+        presentador = new PresentadorPersona(this);
+        presentador.obtenerPersonas();
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
     }
 
     /**
@@ -28,7 +39,7 @@ public class VistaPersona extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tablaPersonas = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtDni = new javax.swing.JTextField();
@@ -36,11 +47,11 @@ public class VistaPersona extends javax.swing.JFrame {
         txtApeliido = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtNombre = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        botonAgregar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tablaPersonas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -51,7 +62,7 @@ public class VistaPersona extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tablaPersonas);
 
         jLabel1.setText("Agregar Personas");
 
@@ -59,15 +70,14 @@ public class VistaPersona extends javax.swing.JFrame {
 
         jLabel3.setText("Apellido:");
 
-        txtApeliido.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtApeliidoActionPerformed(evt);
-            }
-        });
-
         jLabel4.setText("Nombre: ");
 
-        jButton1.setText("Agregar");
+        botonAgregar.setText("Agregar");
+        botonAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonAgregarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -97,7 +107,7 @@ public class VistaPersona extends javax.swing.JFrame {
                         .addComponent(jLabel1)
                         .addGap(356, 356, 356))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(botonAgregar)
                         .addGap(101, 101, 101))))
         );
         layout.setVerticalGroup(
@@ -116,16 +126,29 @@ public class VistaPersona extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
+                .addComponent(botonAgregar)
                 .addContainerGap(82, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtApeliidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtApeliidoActionPerformed
+    private void botonAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAgregarActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtApeliidoActionPerformed
+        int dni;
+        String nombre,apellido;
+        try
+        {
+            dni = Integer.parseInt(this.txtDni.getText());
+            nombre = this.txtNombre.getText();
+            apellido = this.txtApeliido.getText();
+            presentador.agregarPersona(dni, nombre, apellido);
+        }
+        catch(Exception e)
+        {
+           JOptionPane.showMessageDialog(this,"Ha ocurrido un error al agregar una persona","Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_botonAgregarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -163,15 +186,43 @@ public class VistaPersona extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton botonAgregar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tablaPersonas;
     private javax.swing.JTextField txtApeliido;
     private javax.swing.JTextField txtDni;
     private javax.swing.JTextField txtNombre;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void listarPersonas(ArrayList<Persona> personas) {
+        DefaultTableModel modeloTabla = new DefaultTableModel();
+        modeloTabla.addColumn("Dni");
+        modeloTabla.addColumn("Apellido");
+        modeloTabla.addColumn("Nombre");
+        for(Persona p : personas){
+            Object[] fila = {
+                p.getDni(),
+                p.getApellido(),
+                p.getNombre()
+            };
+            modeloTabla.addRow(fila);
+        }
+        this.tablaPersonas.setModel(modeloTabla);
+    }
+
+    @Override
+    public void notificarPersonaAgregada() {
+        JOptionPane.showMessageDialog(this,"Se agrego una persona exitosamente");
+    }
+
+    @Override
+    public void notificarExcepcion(Exception e) {
+        String mensaje = String.format("Hubo un error al agregar una persona \n\n Detalle de Error: %s",e.getMessage());
+        JOptionPane.showMessageDialog(this,mensaje);
+    }
 }
